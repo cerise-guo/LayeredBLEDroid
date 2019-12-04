@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">JobIntentService</string>
+    <string name="test_button_a">Start Service</string>
+    <string name="test_button_b">Stop service loop</string>
+    <string name="test_button_c">Dump discovered devices</string>
+    <string name="test_button_d">Turn LED Off</string>
+    <string name="test_button_e">Turn LED On</string>
+    <string name="test_button_f">Read LED Char</string>
+    <string name="test_button_g">Button G</string>
+    <string name="status_unknown">Unknown</string>
+
+</resources>
