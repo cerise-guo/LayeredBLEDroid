@@ -13,13 +13,11 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 //import com.peripheral.data.BLEDeviceInfo;
 //import com.peripheral.data.DataManager;
 import com.peripheral.logger.SimpleLogger;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +33,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
     private int RESCAN_INTERVAL = 1000; //millisecond
 
     private boolean isScanning = false;
-    private final BLEScanResult scanResult;
+    private final DeviceFound deviceFound;
     private String targetDeviceName;
     private BluetoothGatt mGatt;
     private final Context context;
@@ -58,7 +56,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
 
     private CONNECTION_STATUS connectionStatus = CONNECTION_STATUS.DISCONNECTED;
 
-    public static boolean initiate(Context context, BLEScanResult scanResult ) {
+    public static boolean initiate(Context context, DeviceFound deviceFound ) {
 
         //if( null != BLEDeviceManager.mInstance ){
         //    Log.e(TAG_NAME, "device manager has been initialized");
@@ -66,7 +64,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
         //}
 
         if( null == context ){
-            Log.e(TAG_NAME, "context should not be null");
+            SimpleLogger.getInstance().log(TAG_NAME, "context should not be null");
             throw new RuntimeException("context should not be null");
         }
 
@@ -74,18 +72,18 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
                 ((BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
 
         if (null == adapter || !adapter.isEnabled()) {
-            Log.d(TAG_NAME, "failed to get bt adapter");
+            SimpleLogger.getInstance().log(TAG_NAME, "failed to get bt adapter");
             return false;
         }
 
-        deviceManager = new DeviceManagerImpl(context, adapter, scanResult);
+        deviceManager = new DeviceManagerImpl(context, adapter, deviceFound);
         return true;
     }
 
-    private DeviceManagerImpl(Context context, BluetoothAdapter adapter, BLEScanResult scanResult) {
+    private DeviceManagerImpl(Context context, BluetoothAdapter adapter, DeviceFound deviceFound) {
         this.btAdapter = adapter;
         this.msgHandler = new Handler();
-        this.scanResult = scanResult;
+        this.deviceFound = deviceFound;
         this.context = context;
     }
 
@@ -122,6 +120,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
         // parameter to false.
         mGatt = device.connectGatt(context, false, this);
         connectionStatus = CONNECTION_STATUS.CONNECTING;
+
         return true;
     }
 
@@ -244,14 +243,14 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
     public void onCharacteristicWrite (BluetoothGatt gatt,
                                        BluetoothGattCharacteristic characteristic,
                                        int status){
-        Log.d(TAG_NAME, "onCharacteristicWrite : " + characteristic.getUuid() + " , " + status );
+        SimpleLogger.getInstance().log(TAG_NAME, "onCharacteristicWrite : " + characteristic.getUuid() + " , " + status );
     }
 
     @Override
     public void onCharacteristicRead (BluetoothGatt gatt,
                                       BluetoothGattCharacteristic characteristic,
                                       int status){
-        Log.d(TAG_NAME, "read char " + characteristic.getUuid() + " value : " + characteristic.getValue().toString());
+        SimpleLogger.getInstance().log(TAG_NAME, "read char " + characteristic.getUuid() + " value : " + characteristic.getValue().toString());
 
         if( null != this.readWritelistener ){
             readWritelistener.onRead( status == GATT_SUCCESS , characteristic.getValue());
@@ -271,8 +270,8 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
 
         isReadyToUse = true;
 
-
         List<BluetoothGattService> serviceList = gatt.getServices();
+        SimpleLogger.getInstance().log(TAG_NAME, "onServicesDiscovered : " + serviceList.size() );
 
         for( BluetoothGattService service: serviceList){
             //if( mServices.containsKey( service.getUuid() )){
@@ -313,10 +312,8 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
         ledChar.setValue(value);
 
         boolean result = mGatt.writeCharacteristic( ledChar );
-        Log.d(TAG_NAME, "write LED result: " + result );
+        SimpleLogger.getInstance().log(TAG_NAME, "write LED result: " + result );
     }
-
-
 
     public void read(UUID serviceUUID, UUID characteristicUUID, ReadWriteListener listener ){
 
@@ -327,6 +324,8 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
                 mGatt.getService(serviceUUID)
                         .getCharacteristic(characteristicUUID);
         mGatt.readCharacteristic( ledChar );
+
+        SimpleLogger.getInstance().log(TAG_NAME, "read : " + characteristicUUID );
     }
 
 
@@ -350,7 +349,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
                         BLEDeviceInfo(result.getDevice().getAddress(), result.getDevice().getName());
 
                 //DataManager.getInstance().saveScanResult(info);
-                scanResult.onScanResult( info );
+                deviceFound.onDeviceFound( info );
 
                 if( null != info.name && info.name.equals( targetDeviceName )){
                     if( isScanning ){
@@ -382,7 +381,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
                         result.getRssi() + ", " +
                         result.getScanRecord();
 
-                Log.d(TAG_NAME, resultString );
+                SimpleLogger.getInstance().log(TAG_NAME, resultString );
             }
             throw new AssertionError( "TBD - need set ScanSettings argument");
         }
@@ -391,7 +390,7 @@ public class DeviceManagerImpl extends BluetoothGattCallback implements DeviceMa
         public void onScanFailed(int errorCode) {
             super.onScanFailed(errorCode);
 
-            Log.e(TAG_NAME, "onScanFailed : " + errorCode );
+            SimpleLogger.getInstance().log(TAG_NAME, "onScanFailed : " + errorCode );
         }
     };
 }

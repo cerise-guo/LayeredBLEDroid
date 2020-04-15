@@ -31,7 +31,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_b"
@@ -43,7 +43,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_c"
@@ -55,7 +55,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_d"
@@ -67,7 +67,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_e"
@@ -79,7 +79,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_f"
@@ -91,7 +91,7 @@
         />
 
     <Button
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_button_g"

@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
-import com.peripheral.data.DataManager;
+
 import com.peripheral.data.DataManagerImpl;
 import com.peripheral.logger.SimpleLogger;
 
