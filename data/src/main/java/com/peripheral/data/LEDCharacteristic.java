@@ -26,7 +26,7 @@ public class LEDCharacteristic{ //extends BLECharacteristic {
             UUID serviceUUID,
             DataProcessor processor
     ){
-        this.bleCharacteristic = DataHelper.buildCharacteristic(
+        this.bleCharacteristic = DataHelper.buildCharacteristic(   ///why has this in data layer ?
                 deviceManager, serviceUUID, LED_CHAR_UUID );
         this.dataProcessor = processor;
         this.bleCharacteristic.setListener( new LEDListener() );

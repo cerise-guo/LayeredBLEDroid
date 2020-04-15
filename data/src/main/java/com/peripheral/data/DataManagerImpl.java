@@ -1,12 +1,13 @@
 package com.peripheral.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.peripheral.ble.BLEDeviceInfo;
-import com.peripheral.ble.BLEScanResult;
+import com.peripheral.ble.DeviceFound;
 import com.peripheral.ble.DeviceManager;
 import com.peripheral.ble.DeviceManagerImpl;
+
+import com.peripheral.logger.SimpleLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class DataManagerImpl implements DataManager {
     static private DataManager instance;
     //private static BLEDeviceManager deviceManager;
     private static DeviceManager deviceManager;
-    private final BLEScanResult scanResult;
+    private final DeviceFound deviceFound;
     private String targetDeviceName;
     boolean initialized = false;
 
@@ -34,21 +35,21 @@ public class DataManagerImpl implements DataManager {
     }
 
     private DataManagerImpl(){
-        scanResult = new BLEScanResult() {
+        deviceFound = new DeviceFound() {
             @Override
-            public void onScanResult(BLEDeviceInfo deviceInfo) {
-                saveScanResult( deviceInfo );
+            public void onDeviceFound(BLEDeviceInfo deviceInfo) {
+                saveDevice( deviceInfo );
 
             }
         };
     }
 
-    public void saveScanResult( BLEDeviceInfo deviceInfo ){
+    public void saveDevice( BLEDeviceInfo deviceInfo ){
         if( deviceList.containsKey( deviceInfo.macAddress)){
             //Log.d(TAG_NAME, "duplicated device : " + deviceInfo.name );
         }
         else{
-            Log.d(TAG_NAME, "add device to list: " + deviceInfo.name + " , " + deviceInfo.macAddress );
+            SimpleLogger.getInstance().log(TAG_NAME, "add device to list: " + deviceInfo.name + " , " + deviceInfo.macAddress );
             deviceList.put( deviceInfo.macAddress, deviceInfo );
         }
     }
@@ -79,6 +80,7 @@ public class DataManagerImpl implements DataManager {
 
 
     public void updateDeviceInfo( String targetDeviceName ){
+        SimpleLogger.getInstance().log(TAG_NAME, "start to get device info for : " + targetDeviceName );
         if( null != deviceManager ){
             deviceManager.startConnect( targetDeviceName );
         }
@@ -88,7 +90,7 @@ public class DataManagerImpl implements DataManager {
     public boolean initiate( Context context ){
 
         if (null == deviceManager) {
-            DeviceManagerImpl.initiate(context, this.scanResult);
+            DeviceManagerImpl.initiate(context, this.deviceFound);
             deviceManager = DeviceManagerImpl.getInstance();
         }
         initialized = true;

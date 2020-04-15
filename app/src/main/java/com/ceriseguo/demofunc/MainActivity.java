@@ -41,8 +41,13 @@ public class MainActivity extends AppCompatActivity implements UIMessage {
 
         statusView = (TextView)findViewById(R.id.status_text);
 
-        //BLEDeviceManager.initiate(this);
 
+        SimpleLogger.addUIListener(new SimpleLogger.UILogListener() {
+            @Override
+            public void onLogMessage(String msg) {
+                updateUIMessage( msg );
+            }
+        });
     }
 
     public void updateUIMessage(final String message ){

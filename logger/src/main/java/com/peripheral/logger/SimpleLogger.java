@@ -19,6 +19,13 @@ public class SimpleLogger {
     static String logPath;
     static volatile private SimpleLogger instance;
 
+    //Note: this can be a temporary solution to dump log message to UI layer
+    //This log listener allows hooking one listener to receive all log message.
+    static private UILogListener logListener = null;
+    public interface UILogListener {
+        void onLogMessage( String msg );
+    }
+
     private SimpleLogger() {}
     public static SimpleLogger getInstance(){
         if (instance==null) {
@@ -29,6 +36,13 @@ public class SimpleLogger {
             }
         }
         return instance;
+    }
+
+    static public void addUIListener( UILogListener logListener ){
+        if( null != SimpleLogger.logListener ){
+            throw new RuntimeException("Already set UI log listener");
+        }
+        SimpleLogger.logListener = logListener;
     }
 
     static public void setLogPath(String path ){
@@ -43,6 +57,10 @@ public class SimpleLogger {
 
         logQueue.add(logMessage);
         Log.d(tag, logMessage);
+
+        if( null != SimpleLogger.logListener){
+            logListener.onLogMessage( logMessage );
+        }
 
         if( 100 == logQueue.size()){
             flushLogToDisk();

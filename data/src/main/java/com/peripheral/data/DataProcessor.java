@@ -1,6 +1,7 @@
 package com.peripheral.data;
 
-public interface DataProcessor {
+//Note: this interface is NOT public and only accessible by data layer.
+interface DataProcessor {
 
     byte[] encode( byte value );
 
